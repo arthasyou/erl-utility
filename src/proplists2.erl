@@ -19,7 +19,6 @@
         ,is_defined/2
         ,delete_one/2
 ]).
--compile(export_all).
 
 %% @spec get_value(Key::term(), proplist()) -> term() | undefined
 %% @doc 获取一个值，如不存在则返回undefiend

@@ -21,7 +21,7 @@ sha256(List) ->
     binary_to_list(Bin).
 
 hmacsha256(List, Key) ->
-    Bin = list_to_binary([io_lib:format("~2.16.0b", [N]) || N <- binary_to_list(crypto:hmac(sha256, Key, List))]),
+    Bin = list_to_binary([io_lib:format("~2.16.0b", [N]) || N <- binary_to_list(crypto:mac(hmac, sha256, Key, List))]),
     binary_to_list(Bin).
 
 sha512(List) ->
@@ -29,17 +29,17 @@ sha512(List) ->
     binary_to_list(Bin).
 
 hmacsha512(List, Key) ->
-    Bin = list_to_binary([io_lib:format("~2.16.0b", [N]) || N <- binary_to_list(crypto:hmac(sha512, Key, List))]),
+    Bin = list_to_binary([io_lib:format("~2.16.0b", [N]) || N <- binary_to_list(crypto:mac(hmac, sha512, Key, List))]),
     binary_to_list(Bin).
 
 %% Data=string/binary
 des_encode(Data, Key) ->
     ParS = des_plain_text(Data),
-    Des = crypto:block_encrypt(des_ecb, Key, ParS),
+    Des = crypto:crypto_one_time(des_ecb, Key, ParS, [{encrypt,true}]),
     base64:encode(Des).
 
 des_decode(Key, Bin) ->
-    Binary = crypto:block_decrypt(des_ecb, Key, base64:decode(Bin)),
+    Binary = crypto:crypto_one_time(des_ecb, Key, base64:decode(Bin), [{encrypt,false}]),
     List = binary_to_list(Binary),
     L = [Num | _] = lists:reverse(List),
     do_clean_padding(Num, Num, L).

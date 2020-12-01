@@ -10,29 +10,29 @@
 -author("whn").
 
 %% API
--export([des_ecb_encode/2, des_cbc_encode/2, des_ecb_decode/2, des_cbc_decode/2, to_hex/1, get_padding/1, to_bin/1]).
+-export([des_ecb_encode/2, des_cbc_encode/2, des_ecb_decode/2, des_cbc_decode/2, to_hex/1, get_padding/1, to_bin/1, to_int/1]).
 
 
 des_ecb_encode(Key, Data) ->
     ParS1 = des_plain_text(Data),
-    Bin = crypto:block_encrypt(des_ecb, Key, ParS1),
+    Bin = crypto:crypto_one_time(des_ecb, Key, ParS1, [{encrypt,true}]),
     Bin.
 %%    binary_to_list(to_hex(Bin)).
 des_cbc_encode(Key, Data) ->
     ParS1 = des_plain_text(Data),
-    Bin = crypto:block_encrypt(des_cbc, Key, <<0:64>>, ParS1),
+    Bin = crypto:crypto_one_time(des_cbc, Key, <<0:64>>, ParS1, [{encrypt,true}]),
     binary_to_list(to_hex(Bin)).
 
 des_ecb_decode(Key, Bin) ->
 %%    Bin = base64:decode(Data),
-    Binary = crypto:block_decrypt(des_ecb, Key, Bin),
+    Binary = crypto:crypto_one_time(des_ecb, Key, Bin, [{encrypt,false}]),
     List = binary_to_list(Binary),
     L = [Num | _] = lists:reverse(List),
     do_clean_padding(Num, Num, L).
 
 
 des_cbc_decode(Key, Bin) ->
-    Binary = crypto:block_decrypt(des_cbc, Key, <<0:64>>, Bin),
+    Binary = crypto:crypto_one_time(des_cbc, Key, <<0:64>>, Bin, [{encrypt,false}]),
     List = binary_to_list(Binary),
     L = [Num | _] = lists:reverse(List),
     do_clean_padding(Num, Num, L).
